@@ -69,11 +69,16 @@ def main(args):
             
             teacher_forcing = True if np.random.random() > teacher_forcing_ratio else False
 
-            input = targets[:,0]
+            input = targets[:,0]   ## input size = (batch, 1) -> (16, 1)
             if teacher_forcing:
                 for j in range(targets.shape[1]-1):
                     hashtag_features, (h0, c0), Ul = encoderRNN(input , h0, c0)
+                    ## hashtag_features size = (batch, 1, dim) -> (16, 1, 64)
+                    ## Ul size = (num_objects, dim) -> (83, 64)
+                    
                     outputs = model(image_features, hashtag_features, Ul)
+                    ## outputs size = (batch, num_objects) -> (16, 83)
+                    
                     loss += criterion(outputs, targets[:, j+1].squeeze(1))
                     input = targets[:, j+1]
             else:
